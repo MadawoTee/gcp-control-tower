@@ -1,0 +1,286 @@
+<title>Learning Lab Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eef0f4; --border:#d7dbe3;
+    --text:#171b24; --text-dim:#5c6472; --text-faint:#8991a1;
+
+    --found:#4b5568;  --found-soft:#eceef2;   /* foundation */
+    --net:#2f5fd6;    --net-soft:#eaf0ff;     /* networking */
+    --gke:#177a4c;    --gke-soft:#e7f6ee;     /* kubernetes */
+    --sec:#b5342a;    --sec-soft:#fbe9e7;     /* security */
+    --obs:#8548c9;    --obs-soft:#f2ecfb;     /* observability */
+    --ai:#0d7e93;     --ai-soft:#e4f4f7;      /* ai/ml */
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12141b; --surface:#1a1d26; --surface-2:#20232e; --border:#323645;
+      --text:#eef0f4; --text-dim:#a7aebb; --text-faint:#6f7788;
+      --found:#9aa3b5; --found-soft:#23262f;
+      --net:#7fa2ff; --net-soft:#1c2542;
+      --gke:#5fd9a2; --gke-soft:#173226;
+      --sec:#f28b81; --sec-soft:#3a1f1c;
+      --obs:#c3a4f2; --obs-soft:#2b2140;
+      --ai:#6fd6ea; --ai-soft:#12313a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12141b; --surface:#1a1d26; --surface-2:#20232e; --border:#323645;
+    --text:#eef0f4; --text-dim:#a7aebb; --text-faint:#6f7788;
+    --found:#9aa3b5; --found-soft:#23262f;
+    --net:#7fa2ff; --net-soft:#1c2542;
+    --gke:#5fd9a2; --gke-soft:#173226;
+    --sec:#f28b81; --sec-soft:#3a1f1c;
+    --obs:#c3a4f2; --obs-soft:#2b2140;
+    --ai:#6fd6ea; --ai-soft:#12313a;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    padding-inline:20px; padding-block:32px; max-width:1180px; margin-inline:auto;}
+  h1,h2,h3{font-family:"Manrope",ui-sans-serif,system-ui,sans-serif; text-wrap:balance; margin:0;}
+  h1{font-size:clamp(1.6rem,4vw,2.3rem); font-weight:800; letter-spacing:-0.02em;}
+  h2{font-size:1.15rem; font-weight:700; letter-spacing:-0.01em;}
+  p{color:var(--text-dim); line-height:1.6; margin:0;}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;}
+
+  header.page{display:flex; flex-direction:column; gap:10px; padding-block-end:26px; margin-block-end:30px; border-bottom:1px solid var(--border);}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--net); font-weight:500;}
+  header.page p{max-width:66ch; font-size:.98rem;}
+
+  section{margin-block-end:44px;}
+  section > h2{margin-block-end:4px;}
+  section > .section-sub{font-size:.88rem; margin-block-end:18px; max-width:72ch;}
+
+  .callout{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:16px 18px;
+  }
+  .callout .badge{
+    flex:none; width:30px; height:30px; border-radius:8px;
+    background:var(--net-soft); color:var(--net); display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:.85rem;
+  }
+  .callout p{font-size:.88rem;}
+  .callout strong{color:var(--text); font-weight:600;}
+
+  .diagram-frame{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px clamp(8px,2vw,22px); overflow-x:auto;}
+  figcaption{margin-block-start:12px; font-size:.85rem; color:var(--text-faint);}
+  svg{display:block; width:100%; height:auto; min-width:600px;}
+  svg text{fill:currentColor; font-family:"IBM Plex Mono",monospace;}
+  .lbl-title{font-family:"IBM Plex Sans",sans-serif; font-weight:600;}
+
+  .phase-row{display:flex; flex-direction:column; gap:12px;}
+  .phase-card{
+    display:grid; grid-template-columns:56px 1fr auto; gap:16px; align-items:start;
+    background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--_accent);
+    border-radius:10px; padding:14px 16px;
+  }
+  .phase-card .num{
+    font-family:"IBM Plex Mono",monospace; font-weight:700; font-size:1rem;
+    color:var(--_accent); background:var(--_soft); border-radius:8px;
+    height:40px; display:flex; align-items:center; justify-content:center;
+  }
+  .phase-card h3{font-size:1rem; font-weight:700; margin-block-end:4px;}
+  .phase-card p{font-size:.86rem;}
+  .phase-card .meta{display:flex; flex-direction:column; gap:6px; align-items:flex-end; text-align:right; font-size:.76rem; color:var(--text-faint); white-space:nowrap;}
+  .phase-card .cost{
+    font-family:"IBM Plex Mono",monospace; font-size:.72rem; padding:3px 8px; border-radius:6px;
+    background:var(--_soft); color:var(--_accent); font-weight:500;
+  }
+  .p-found{--_accent:var(--found); --_soft:var(--found-soft);}
+  .p-net{--_accent:var(--net); --_soft:var(--net-soft);}
+  .p-gke{--_accent:var(--gke); --_soft:var(--gke-soft);}
+  .p-sec{--_accent:var(--sec); --_soft:var(--sec-soft);}
+  .p-obs{--_accent:var(--obs); --_soft:var(--obs-soft);}
+  .p-ai{--_accent:var(--ai); --_soft:var(--ai-soft);}
+
+  .legend{display:flex; flex-wrap:wrap; gap:10px 20px; margin-block-start:16px; font-size:.82rem; color:var(--text-dim);}
+  .legend span{display:inline-flex; align-items:center; gap:7px;}
+  .swatch{width:11px; height:11px; border-radius:3px; flex:none;}
+
+  a.reflink{color:var(--net); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--net) 40%, transparent);}
+  a.reflink:hover{border-bottom-color:var(--net);}
+
+  footer.page{border-top:1px solid var(--border); padding-block-start:20px; margin-block-start:8px; font-size:.82rem; color:var(--text-faint);
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;}
+
+  @media (max-width:640px){
+    .phase-card{grid-template-columns:44px 1fr; }
+    .phase-card .meta{grid-column:1 / -1; flex-direction:row; align-items:center; justify-content:flex-start; text-align:left;}
+  }
+</style>
+
+<header class="page">
+  <span class="eyebrow">GCP learning lab · personal account</span>
+  <h1>Learning Lab Roadmap</h1>
+  <p>Six phases, built one at a time, each proven before the next starts. This reworks the enterprise control tower for a real personal account: no assumed Organization, a strict cost ceiling, and one environment until the fundamentals are solid. Full network topology detail lives in the companion <a class="reflink" href="https://claude.ai/artifact/Lhw6uW284zYTB8J13tep6g" target="_blank" rel="noopener">Control Tower Blueprint</a>.</p>
+</header>
+
+<section aria-labelledby="step0-h">
+  <h2 id="step0-h">Step 0 — a standalone project, no domain needed</h2>
+  <p class="section-sub">Decision made: building without a domain for now. Every stage defaults <code>folder_id</code> and <code>org_id</code> to <code>null</code>, so <code>0-bootstrap</code> creates a plain project with no Organization parent — exactly what you'd get creating one by hand in the console. The domain/Cloud Identity path stays available later, as an opt-in, not a prerequisite.</p>
+
+  <figure class="diagram-frame">
+    <svg viewBox="0 0 1200 220" role="img" aria-label="Diagram: the chosen path is your GCP account directly to 0-bootstrap, which creates one standalone project with no organization or folder parent, then 1-networking builds the VPC inside it. A second, dashed, optional path shows that registering a domain and enabling Cloud Identity Free later can still produce a real Organization, unlocking the advanced folder hierarchy, without changing anything already built.">
+      <text x="30" y="24" class="lbl-title" font-size="12" fill="var(--gke)">CHOSEN PATH — no domain</text>
+      <g transform="translate(30,38)">
+        <rect width="230" height="66" rx="10" fill="var(--surface-2)" stroke="var(--border)"/>
+        <text x="16" y="26" font-size="11" fill="var(--text-dim)">Your GCP account</text>
+        <text x="16" y="44" font-size="9.5" fill="var(--text-faint)">no Organization, no folders</text>
+      </g>
+      <line x1="260" y1="71" x2="300" y2="71" stroke="var(--gke)" stroke-width="1.4" marker-end="url(#arrow0)"/>
+      <g transform="translate(302,38)">
+        <rect width="260" height="66" rx="10" fill="var(--gke-soft)" stroke="var(--gke)" stroke-width="1.4"/>
+        <text x="16" y="26" class="lbl-title" font-size="11.5" fill="var(--gke)">0-bootstrap</text>
+        <text x="16" y="44" font-size="9.5" fill="var(--text-dim)">org_id = null → standalone project</text>
+      </g>
+      <line x1="562" y1="71" x2="602" y2="71" stroke="var(--gke)" stroke-width="1.4" marker-end="url(#arrow0)"/>
+      <g transform="translate(604,38)">
+        <rect width="260" height="66" rx="10" fill="var(--surface)" stroke="var(--gke)" stroke-width="1.6"/>
+        <text x="16" y="26" class="lbl-title" font-size="11.5" fill="var(--gke)">1-networking</text>
+        <text x="16" y="44" font-size="9.5" fill="var(--text-dim)">single VPC, inside that project</text>
+      </g>
+      <g transform="translate(880,38)">
+        <rect width="290" height="66" rx="10" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="16" y="26" font-size="11" fill="var(--text-dim)">Cost today</text>
+        <text x="16" y="44" font-size="9.5" fill="var(--text-faint)">$0 to register — pay only for what runs</text>
+      </g>
+
+      <line x1="145" y1="104" x2="145" y2="150" stroke="var(--border)" stroke-dasharray="4 4"/>
+      <text x="30" y="172" class="lbl-title" font-size="11" fill="var(--text-faint)">OPTIONAL, LATER — add a domain whenever you want real folders/org policies</text>
+      <g transform="translate(30,182)" font-size="9.5" fill="var(--text-faint)">
+        <text x="0" y="14">Register a domain (~$10–15/yr)</text>
+        <text x="230" y="14">→</text>
+        <text x="250" y="14">Cloud Identity Free ($0)</text>
+        <text x="470" y="14">→</text>
+        <text x="490" y="14">real Organization → unlocks advanced/1-organization</text>
+      </g>
+
+      <defs>
+        <marker id="arrow0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--gke)"/>
+        </marker>
+      </defs>
+    </svg>
+  </figure>
+
+  <div class="callout" style="margin-block-start:14px;">
+    <span class="badge">✓</span>
+    <p><strong>This is what's actually built.</strong> <code>0-bootstrap</code> and <code>1-networking</code> are live in the repo, reusing the same <code>modules/vpc-spoke</code> and <code>modules/firewall-baseline</code> the enterprise design uses. The org-dependent stages moved to <code>advanced/</code> — real, working Terraform, just set aside until their tickets (NET-5 onward) come up.</p>
+  </div>
+</section>
+
+<section aria-labelledby="net-evo-h">
+  <h2 id="net-evo-h">Networking: start simple, level up later</h2>
+  <p class="section-sub">Phase 2 ships a single VPC — the fundamentals. Hub-and-spoke (already built in the control tower repo's <code>modules/vpc-hub</code>, <code>vpc-spoke</code>, <code>ncc-hub-spoke</code>) becomes a deliberate NET-5 ticket once that's solid, not the starting point.</p>
+  <figure class="diagram-frame">
+    <svg viewBox="0 0 1200 230" role="img" aria-label="Diagram comparing two networking states: now, a single custom VPC in the dev project with two subnets, Cloud NAT and firewall rules; later, that same VPC becomes one spoke among several attached to a Network Connectivity Center hub for transitive multi-VPC routing.">
+      <text x="30" y="26" class="lbl-title" font-size="12" fill="var(--gke)">NOW — Phase 2</text>
+      <g transform="translate(30,40)">
+        <rect width="340" height="150" rx="10" fill="var(--gke-soft)" stroke="var(--gke)" stroke-width="1.3"/>
+        <text x="16" y="26" class="lbl-title" font-size="11.5" fill="var(--gke)">vpc-dev (single VPC)</text>
+        <g transform="translate(16,42)">
+          <rect width="140" height="50" rx="7" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="70" y="20" text-anchor="middle" font-size="9.5">subnet: gke-nodes</text>
+          <text x="70" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">10.10.0.0/22</text>
+        </g>
+        <g transform="translate(172,42)">
+          <rect width="150" height="50" rx="7" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="75" y="20" text-anchor="middle" font-size="9.5">subnet: private-svcs</text>
+          <text x="75" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">10.10.4.0/24</text>
+        </g>
+        <text x="16" y="118" font-size="9.5" fill="var(--text-dim)">Cloud Router + Cloud NAT → internet</text>
+        <text x="16" y="134" font-size="9.5" fill="var(--text-dim)">firewall-baseline: IAP-SSH · internal · health checks</text>
+      </g>
+
+      <g stroke="var(--text-faint)" fill="none">
+        <path d="M390,110 L440,110" stroke-width="1.4" marker-end="url(#arrow1)"/>
+      </g>
+      <text x="415" y="98" text-anchor="middle" font-size="9" fill="var(--text-faint)">NET-5</text>
+
+      <text x="470" y="26" class="lbl-title" font-size="12" fill="var(--net)">LATER — level-up ticket</text>
+      <g transform="translate(470,40)">
+        <rect width="700" height="150" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="4 4"/>
+        <polygon points="350,25 380,42 380,68 350,85 320,68 320,42" fill="var(--surface)" stroke="var(--net)" stroke-width="1.4" transform="translate(0,-5)"/>
+        <text x="350" y="52" text-anchor="middle" font-size="9.5" fill="var(--net)">NCC Hub</text>
+
+        <line x1="330" y1="80" x2="120" y2="115" stroke="var(--net)" stroke-dasharray="4 3"/>
+        <line x1="370" y1="80" x2="580" y2="115" stroke="var(--net)" stroke-dasharray="4 3"/>
+
+        <g transform="translate(40,118)">
+          <rect width="160" height="50" rx="7" fill="var(--gke-soft)" stroke="var(--gke)"/>
+          <text x="80" y="20" text-anchor="middle" font-size="9.5" fill="var(--gke)">vpc-dev spoke</text>
+          <text x="80" y="35" text-anchor="middle" font-size="8" fill="var(--text-faint)">(unchanged)</text>
+        </g>
+        <g transform="translate(500,118)">
+          <rect width="160" height="50" rx="7" fill="var(--surface-2)" stroke="var(--border)"/>
+          <text x="80" y="20" text-anchor="middle" font-size="9.5">vpc-staging spoke</text>
+          <text x="80" y="35" text-anchor="middle" font-size="8" fill="var(--text-faint)">new — proves transitivity</text>
+        </g>
+      </g>
+      <defs>
+        <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+    </svg>
+  </figure>
+</section>
+
+<section aria-labelledby="phases-h">
+  <h2 id="phases-h">The six phases</h2>
+  <p class="section-sub">Each phase is its own epic in the backlog board — see the linked ticket board below.</p>
+  <div class="phase-row">
+    <div class="phase-card p-found">
+      <span class="num">0–1</span>
+      <div><h3>Foundation</h3><p>One standalone project (no domain, no org). Bootstrap Terraform state + WIF for GitHub Actions. Naming/labeling convention in place of folders. Billing budget alert.</p></div>
+      <div class="meta"><span class="cost">$0 to start</span><span>epic FOUND</span></div>
+    </div>
+    <div class="phase-card p-net">
+      <span class="num">2</span>
+      <div><h3>Networking</h3><p>One custom VPC, subnets, Private Google Access, Cloud NAT, firewall baseline, connectivity tests. Hub-and-spoke is a later level-up.</p></div>
+      <div class="meta"><span class="cost">~$1–3/mo (NAT)</span><span>epic NET</span></div>
+    </div>
+    <div class="phase-card p-gke">
+      <span class="num">3</span>
+      <div><h3>Kubernetes</h3><p>One private, VPC-native GKE Autopilot cluster. Workload Identity, namespaces (platform / observability / applications), network policy.</p></div>
+      <div class="meta"><span class="cost">~$5–15/mo</span><span>epic GKE</span></div>
+    </div>
+    <div class="phase-card p-sec">
+      <span class="num">4</span>
+      <div><h3>Security</h3><p>IAM least privilege, audit logging, KMS-encrypted secret, Security Command Center (know the free/paid line).</p></div>
+      <div class="meta"><span class="cost">mostly $0</span><span>epic SEC</span></div>
+    </div>
+    <div class="phase-card p-obs">
+      <span class="num">5</span>
+      <div><h3>Observability</h3><p>Cloud Monitoring + Logging, Managed Prometheus, one dashboard spanning infra/k8s/app/network/security signals.</p></div>
+      <div class="meta"><span class="cost">$0–5/mo</span><span>epic OBS</span></div>
+    </div>
+    <div class="phase-card p-ai">
+      <span class="num">6</span>
+      <div><h3>AI / ML</h3><p>Lightweight inference on GKE, then the same model on a Vertex AI endpoint — compare cost and ops. No standing GPUs.</p></div>
+      <div class="meta"><span class="cost">pay-per-call</span><span>epic AI</span></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--found)"></i>foundation</span>
+    <span><i class="swatch" style="background:var(--net)"></i>networking</span>
+    <span><i class="swatch" style="background:var(--gke)"></i>kubernetes</span>
+    <span><i class="swatch" style="background:var(--sec)"></i>security</span>
+    <span><i class="swatch" style="background:var(--obs)"></i>observability</span>
+    <span><i class="swatch" style="background:var(--ai)"></i>ai / ml</span>
+  </div>
+</section>
+
+<footer class="page">
+  <span>gcp-control-tower · learning lab edition</span>
+  <span class="mono">africa-south1 (Johannesburg)</span>
+</footer>

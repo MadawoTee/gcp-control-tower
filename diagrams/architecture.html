@@ -1,0 +1,471 @@
+<title>Control Tower Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f6f8;
+    --surface:#ffffff;
+    --surface-2:#eef0f4;
+    --border:#d7dbe3;
+    --text:#171b24;
+    --text-dim:#5c6472;
+    --text-faint:#8991a1;
+
+    --net:#2f5fd6;      /* networking / hub */
+    --net-soft:#eaf0ff;
+    --dev:#177a4c;       /* dev env */
+    --dev-soft:#e7f6ee;
+    --staging:#b06a08;   /* staging env */
+    --staging-soft:#fdf1e0;
+    --prod:#b5342a;      /* prod env */
+    --prod-soft:#fbe9e7;
+    --ci:#6a3fc7;         /* ci/cd */
+    --ci-soft:#f0ebfc;
+    --ai:#0d7e93;          /* ai apps */
+    --ai-soft:#e4f4f7;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12141b;
+      --surface:#1a1d26;
+      --surface-2:#20232e;
+      --border:#323645;
+      --text:#eef0f4;
+      --text-dim:#a7aebb;
+      --text-faint:#6f7788;
+
+      --net:#7fa2ff;
+      --net-soft:#1c2542;
+      --dev:#5fd9a2;
+      --dev-soft:#173226;
+      --staging:#f0b258;
+      --staging-soft:#3a2c14;
+      --prod:#f28b81;
+      --prod-soft:#3a1f1c;
+      --ci:#b79bf5;
+      --ci-soft:#2a2244;
+      --ai:#6fd6ea;
+      --ai-soft:#12313a;
+
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"]{
+    --bg:#12141b;
+    --surface:#1a1d26;
+    --surface-2:#20232e;
+    --border:#323645;
+    --text:#eef0f4;
+    --text-dim:#a7aebb;
+    --text-faint:#6f7788;
+
+    --net:#7fa2ff;
+    --net-soft:#1c2542;
+    --dev:#5fd9a2;
+    --dev-soft:#173226;
+    --staging:#f0b258;
+    --staging-soft:#3a2c14;
+    --prod:#f28b81;
+    --prod-soft:#3a1f1c;
+    --ci:#b79bf5;
+    --ci-soft:#2a2244;
+    --ai:#6fd6ea;
+    --ai-soft:#12313a;
+
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:20px;
+    padding-block:32px;
+    max-width:1180px;
+    margin-inline:auto;
+  }
+  h1,h2,h3{
+    font-family:"Manrope", ui-sans-serif, system-ui, sans-serif;
+    text-wrap:balance;
+    margin:0;
+  }
+  h1{font-size:clamp(1.6rem,4vw,2.3rem); font-weight:800; letter-spacing:-0.02em;}
+  h2{font-size:1.15rem; font-weight:700; letter-spacing:-0.01em;}
+  p{color:var(--text-dim); line-height:1.6; margin:0;}
+  code, .mono{font-family:"IBM Plex Mono", ui-monospace, monospace;}
+
+  header.page{
+    display:flex; flex-direction:column; gap:10px;
+    padding-block-end:28px; margin-block-end:28px;
+    border-bottom:1px solid var(--border);
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--net); font-weight:500;
+  }
+  header.page p{max-width:64ch; color:var(--text-dim); font-size:.98rem;}
+
+  section{margin-block-end:44px;}
+  section > h2{margin-block-end:4px;}
+  section > .section-sub{font-size:.88rem; margin-block-end:18px; max-width:70ch;}
+
+  figure{margin:0;}
+  .diagram-frame{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px clamp(8px,2vw,22px);
+    overflow-x:auto;
+  }
+  figcaption{
+    margin-block-start:12px;
+    font-size:.85rem;
+    color:var(--text-faint);
+  }
+  svg{display:block; width:100%; height:auto; min-width:640px;}
+  svg text{fill:currentColor; font-family:"IBM Plex Mono", monospace;}
+  .lbl-title{font-family:"IBM Plex Sans", sans-serif; font-weight:600;}
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:10px 20px;
+    margin-block-start:16px; font-size:.82rem; color:var(--text-dim);
+  }
+  .legend span{display:inline-flex; align-items:center; gap:7px;}
+  .swatch{width:11px; height:11px; border-radius:3px; flex:none;}
+
+  .phases{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:14px;
+  }
+  .phase{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 18px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .phase .num{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; font-weight:500; letter-spacing:.06em;
+    color:var(--text-faint);
+  }
+  .phase h3{font-size:1rem; font-weight:700;}
+  .phase p{font-size:.86rem;}
+  .phase .stages{
+    display:flex; flex-wrap:wrap; gap:6px; margin-block-start:4px;
+  }
+  .stages code{
+    font-size:.72rem; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:6px;
+    padding:2px 7px; color:var(--text-dim);
+  }
+
+  footer.page{
+    border-top:1px solid var(--border);
+    padding-block-start:20px; margin-block-start:8px;
+    font-size:.82rem; color:var(--text-faint);
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;
+  }
+
+  @media (max-width:560px){
+    header.page{gap:8px;}
+  }
+</style>
+
+<header class="page">
+  <span class="eyebrow">GCP · multi-project landing zone</span>
+  <h1>Control Tower Blueprint</h1>
+  <p>How this repository's Terraform stages fit together: one Network Connectivity Center hub joining three per-environment Shared VPCs, a GKE cluster and AI workload dropped into each spoke, and a GitHub Actions pipeline that applies every stage through Workload Identity Federation — no service account keys, anywhere.</p>
+</header>
+
+<section aria-labelledby="topo-h">
+  <h2 id="topo-h">Network &amp; compute topology</h2>
+  <p class="section-sub">Every environment owns its own project and its own VPC. Network Connectivity Center gives every spoke a transitive route to every other spoke through the hub — dev can reach staging without a direct peering link between them.</p>
+
+  <figure class="diagram-frame">
+    <svg viewBox="0 0 1200 620" role="img" aria-label="Diagram showing an Organization split into folders, a networking-hub project and VPC connected via a Network Connectivity Center hub to three environment spokes (dev, staging, prod), each with its own Shared VPC host project, workload project, GKE cluster, and Cloud NAT egress; the dev spoke additionally hosts a Vertex AI notebook.">
+
+      <!-- ===== folder strip ===== -->
+      <g font-size="11">
+        <rect x="20" y="16" width="1160" height="54" rx="10" fill="none" stroke="var(--border)" stroke-dasharray="3 4"/>
+        <text x="34" y="35" class="lbl-title" font-size="11" fill="var(--text-faint)">ORGANIZATION</text>
+        <text x="34" y="52" font-size="10" fill="var(--text-faint)">folders/</text>
+
+        <g transform="translate(140,28)">
+          <rect width="150" height="30" rx="7" fill="var(--surface-2)" stroke="var(--border)"/>
+          <text x="75" y="19" text-anchor="middle" fill="var(--text-dim)">bootstrap</text>
+        </g>
+        <g transform="translate(310,28)">
+          <rect width="150" height="30" rx="7" fill="var(--net-soft)" stroke="var(--net)"/>
+          <text x="75" y="19" text-anchor="middle" fill="var(--net)">networking</text>
+        </g>
+        <g transform="translate(480,28)">
+          <rect width="430" height="30" rx="7" fill="var(--surface-2)" stroke="var(--border)"/>
+          <text x="18" y="19" fill="var(--text-dim)">environments /</text>
+          <text x="150" y="19" fill="var(--dev)">dev</text>
+          <text x="195" y="19" fill="var(--text-faint)">·</text>
+          <text x="215" y="19" fill="var(--staging)">staging</text>
+          <text x="290" y="19" fill="var(--text-faint)">·</text>
+          <text x="310" y="19" fill="var(--prod)">prod</text>
+        </g>
+        <g transform="translate(930,28)">
+          <rect width="130" height="30" rx="7" fill="var(--surface-2)" stroke="var(--border)"/>
+          <text x="65" y="19" text-anchor="middle" fill="var(--text-dim)">sandbox</text>
+        </g>
+      </g>
+
+      <!-- ===== hub project ===== -->
+      <g transform="translate(450,96)">
+        <rect width="300" height="74" rx="10" fill="var(--net-soft)" stroke="var(--net)" stroke-width="1.4"/>
+        <text x="16" y="24" class="lbl-title" font-size="12.5" fill="var(--net)">networking-hub</text>
+        <text x="16" y="42" font-size="10.5" fill="var(--text-dim)">VPC · vpc-hub · 10.0.0.0/24</text>
+        <text x="16" y="58" font-size="10.5" fill="var(--text-dim)">Cloud DNS inbound forwarding</text>
+      </g>
+      <line x1="600" y1="170" x2="600" y2="196" stroke="var(--net)" stroke-width="1.4"/>
+
+      <!-- ===== NCC hub node ===== -->
+      <g transform="translate(600,222)">
+        <polygon points="0,-30 34,-15 34,15 0,30 -34,15 -34,-15" fill="var(--surface)" stroke="var(--net)" stroke-width="1.6"/>
+        <text y="-2" text-anchor="middle" font-size="10.5" fill="var(--net)" class="lbl-title">NCC Hub</text>
+        <text y="13" text-anchor="middle" font-size="9" fill="var(--text-faint)">control-tower-hub</text>
+      </g>
+
+      <!-- connectors hub -> spokes -->
+      <line x1="574" y1="248" x2="200" y2="330" stroke="var(--net)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <line x1="600" y1="252" x2="600" y2="330" stroke="var(--net)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <line x1="626" y1="248" x2="1000" y2="330" stroke="var(--net)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="330" y="290" font-size="9.5" fill="var(--text-faint)">NCC spoke (transitive route)</text>
+      <text x="700" y="290" font-size="9.5" fill="var(--text-faint)">NCC spoke</text>
+
+      <!-- ===== spoke columns ===== -->
+      <!-- dev -->
+      <g transform="translate(50,330)">
+        <rect width="300" height="62" rx="9" fill="var(--dev-soft)" stroke="var(--dev)" stroke-width="1.3"/>
+        <text x="14" y="22" class="lbl-title" font-size="11.5" fill="var(--dev)">dev-net-host</text>
+        <text x="14" y="38" font-size="9.5" fill="var(--text-dim)">vpc-dev · 10.10.0.0/20</text>
+        <text x="14" y="52" font-size="9.5" fill="var(--text-dim)">Cloud NAT → internet egress</text>
+
+        <line x1="150" y1="62" x2="150" y2="88" stroke="var(--dev)" stroke-width="1.2"/>
+        <g transform="translate(0,88)">
+          <rect width="300" height="52" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="14" y="20" font-size="10.5" fill="var(--text)">dev-apps</text>
+          <text x="14" y="36" font-size="9" fill="var(--text-faint)">Shared VPC service project</text>
+        </g>
+
+        <line x1="80" y1="140" x2="80" y2="164" stroke="var(--border)"/>
+        <line x1="220" y1="140" x2="220" y2="164" stroke="var(--border)"/>
+        <g transform="translate(10,164)">
+          <rect width="140" height="48" rx="8" fill="var(--surface-2)" stroke="var(--dev)"/>
+          <text x="70" y="20" text-anchor="middle" font-size="10" fill="var(--dev)">GKE · gke-dev</text>
+          <text x="70" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">Autopilot, private</text>
+        </g>
+        <g transform="translate(150,164)">
+          <rect width="140" height="48" rx="8" fill="var(--ai-soft)" stroke="var(--ai)"/>
+          <text x="70" y="20" text-anchor="middle" font-size="10" fill="var(--ai)">Vertex AI</text>
+          <text x="70" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">Workbench notebook</text>
+        </g>
+        <text x="150" y="240" text-anchor="middle" font-size="10.5" fill="var(--dev)" class="lbl-title">dev</text>
+      </g>
+
+      <!-- staging -->
+      <g transform="translate(450,330)">
+        <rect width="300" height="62" rx="9" fill="var(--staging-soft)" stroke="var(--staging)" stroke-width="1.3"/>
+        <text x="14" y="22" class="lbl-title" font-size="11.5" fill="var(--staging)">staging-net-host</text>
+        <text x="14" y="38" font-size="9.5" fill="var(--text-dim)">vpc-staging · 10.20.0.0/20</text>
+        <text x="14" y="52" font-size="9.5" fill="var(--text-dim)">Cloud NAT → internet egress</text>
+
+        <line x1="150" y1="62" x2="150" y2="88" stroke="var(--staging)" stroke-width="1.2"/>
+        <g transform="translate(0,88)">
+          <rect width="300" height="52" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="14" y="20" font-size="10.5" fill="var(--text)">staging-apps</text>
+          <text x="14" y="36" font-size="9" fill="var(--text-faint)">Shared VPC service project</text>
+        </g>
+
+        <line x1="150" y1="140" x2="150" y2="164" stroke="var(--border)"/>
+        <g transform="translate(80,164)">
+          <rect width="140" height="48" rx="8" fill="var(--surface-2)" stroke="var(--staging)"/>
+          <text x="70" y="20" text-anchor="middle" font-size="10" fill="var(--staging)">GKE · gke-staging</text>
+          <text x="70" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">Autopilot, private</text>
+        </g>
+        <text x="150" y="240" text-anchor="middle" font-size="10.5" fill="var(--staging)" class="lbl-title">staging</text>
+      </g>
+
+      <!-- prod -->
+      <g transform="translate(850,330)">
+        <rect width="300" height="62" rx="9" fill="var(--prod-soft)" stroke="var(--prod)" stroke-width="1.3"/>
+        <text x="14" y="22" class="lbl-title" font-size="11.5" fill="var(--prod)">prod-net-host</text>
+        <text x="14" y="38" font-size="9.5" fill="var(--text-dim)">vpc-prod · 10.30.0.0/20</text>
+        <text x="14" y="52" font-size="9.5" fill="var(--text-dim)">Cloud NAT → internet egress</text>
+
+        <line x1="150" y1="62" x2="150" y2="88" stroke="var(--prod)" stroke-width="1.2"/>
+        <g transform="translate(0,88)">
+          <rect width="300" height="52" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="14" y="20" font-size="10.5" fill="var(--text)">prod-apps</text>
+          <text x="14" y="36" font-size="9" fill="var(--text-faint)">Shared VPC service project</text>
+        </g>
+
+        <g transform="translate(80,164)">
+          <rect width="140" height="48" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="4 3"/>
+          <text x="70" y="20" text-anchor="middle" font-size="10" fill="var(--text-faint)">GKE reserved</text>
+          <text x="70" y="35" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">commented out by default</text>
+        </g>
+        <text x="150" y="240" text-anchor="middle" font-size="10.5" fill="var(--prod)" class="lbl-title">prod</text>
+      </g>
+
+      <!-- firewall note -->
+      <text x="600" y="600" text-anchor="middle" font-size="9.5" fill="var(--text-faint)">every VPC also carries firewall-baseline: IAP-only SSH · allow-internal · health checks</text>
+    </svg>
+  </figure>
+
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--net)"></i>networking / hub</span>
+    <span><i class="swatch" style="background:var(--dev)"></i>dev environment</span>
+    <span><i class="swatch" style="background:var(--staging)"></i>staging environment</span>
+    <span><i class="swatch" style="background:var(--prod)"></i>prod environment</span>
+    <span><i class="swatch" style="background:var(--ai)"></i>AI workload</span>
+  </div>
+</section>
+
+<section aria-labelledby="cicd-h">
+  <h2 id="cicd-h">CI/CD pipeline</h2>
+  <p class="section-sub">GitHub Actions authenticates to GCP by exchanging a short-lived OIDC token for GCP credentials — Workload Identity Federation — so no service-account key ever leaves Google Cloud or sits in a GitHub secret.</p>
+
+  <figure class="diagram-frame">
+    <svg viewBox="0 0 1200 300" role="img" aria-label="Diagram showing a pull request triggering terraform-plan.yml which authenticates via Workload Identity Federation and posts a plan comment, and a merge to main triggering terraform-apply.yml which authenticates the same way and applies stages 1 through 5 in sequence, with stages 4 and 5 gated behind a GitHub Environment approval, ending in the deployed dev, staging and prod environments.">
+
+      <!-- lane A: PR / plan -->
+      <g transform="translate(20,26)">
+        <rect width="150" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="75" y="22" text-anchor="middle" font-size="10.5" fill="var(--text)">Pull request</text>
+        <text x="75" y="36" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">opened / updated</text>
+      </g>
+      <line x1="170" y1="49" x2="204" y2="49" stroke="var(--ci)" marker-end="url(#arrow)"/>
+      <g transform="translate(206,26)">
+        <rect width="190" height="46" rx="8" fill="var(--ci-soft)" stroke="var(--ci)"/>
+        <text x="95" y="20" text-anchor="middle" font-size="10.5" fill="var(--ci)">terraform-plan.yml</text>
+        <text x="95" y="36" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">fmt · validate · plan</text>
+      </g>
+      <line x1="396" y1="49" x2="430" y2="49" stroke="var(--ci)" marker-end="url(#arrow)"/>
+      <g transform="translate(432,26)">
+        <rect width="180" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="90" y="20" text-anchor="middle" font-size="10.5" fill="var(--text)">PR comment</text>
+        <text x="90" y="36" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">plan output, no apply</text>
+      </g>
+
+      <!-- WIF node -->
+      <g transform="translate(560,120)">
+        <rect width="220" height="58" rx="10" fill="var(--surface)" stroke="var(--net)" stroke-width="1.5"/>
+        <text x="110" y="24" text-anchor="middle" font-size="10.5" fill="var(--net)" class="lbl-title">Workload Identity Federation</text>
+        <text x="110" y="40" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">OIDC token → short-lived GCP creds</text>
+        <text x="110" y="52" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">no service-account keys</text>
+      </g>
+      <line x1="300" y1="72" x2="640" y2="120" stroke="var(--net)" stroke-dasharray="4 4"/>
+      <line x1="700" y1="178" x2="700" y2="200" stroke="var(--net)" stroke-dasharray="4 4"/>
+
+      <!-- lane B: merge / apply -->
+      <g transform="translate(20,206)">
+        <rect width="150" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="75" y="22" text-anchor="middle" font-size="10.5" fill="var(--text)">Merge to main</text>
+        <text x="75" y="36" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">review approved</text>
+      </g>
+      <line x1="170" y1="229" x2="204" y2="229" stroke="var(--ci)" marker-end="url(#arrow)"/>
+      <g transform="translate(206,206)">
+        <rect width="190" height="46" rx="8" fill="var(--ci-soft)" stroke="var(--ci)"/>
+        <text x="95" y="20" text-anchor="middle" font-size="10.5" fill="var(--ci)">terraform-apply.yml</text>
+        <text x="95" y="36" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">sequential stage apply</text>
+      </g>
+
+      <line x1="396" y1="229" x2="420" y2="229" stroke="var(--ci)" marker-end="url(#arrow)"/>
+      <g font-size="9" text-anchor="middle">
+        <g transform="translate(422,206)">
+          <rect width="90" height="46" rx="7" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="45" y="20" fill="var(--text)">1-org</text>
+          <text x="45" y="34" fill="var(--text-faint)">folders</text>
+        </g>
+        <line x1="512" y1="229" x2="528" y2="229" stroke="var(--border)" marker-end="url(#arrow-dim)"/>
+        <g transform="translate(530,206)">
+          <rect width="100" height="46" rx="7" fill="var(--net-soft)" stroke="var(--net)"/>
+          <text x="50" y="20" fill="var(--net)">2-network</text>
+          <text x="50" y="34" fill="var(--text-faint)">hub + spokes</text>
+        </g>
+        <line x1="630" y1="229" x2="646" y2="229" stroke="var(--border)" marker-end="url(#arrow-dim)"/>
+        <g transform="translate(648,206)">
+          <rect width="96" height="46" rx="7" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="48" y="20" fill="var(--text)">3-projects</text>
+          <text x="48" y="34" fill="var(--text-faint)">app factory</text>
+        </g>
+        <line x1="744" y1="229" x2="760" y2="229" stroke="var(--border)" marker-end="url(#arrow-dim)"/>
+        <g transform="translate(762,206)">
+          <rect width="88" height="46" rx="7" fill="var(--dev-soft)" stroke="var(--dev)"/>
+          <text x="44" y="20" fill="var(--dev)">4-gke</text>
+          <text x="44" y="34" fill="var(--text-faint)">⚿ approval</text>
+        </g>
+        <line x1="850" y1="229" x2="866" y2="229" stroke="var(--border)" marker-end="url(#arrow-dim)"/>
+        <g transform="translate(868,206)">
+          <rect width="100" height="46" rx="7" fill="var(--ai-soft)" stroke="var(--ai)"/>
+          <text x="50" y="20" fill="var(--ai)">5-ai-apps</text>
+          <text x="50" y="34" fill="var(--text-faint)">⚿ approval</text>
+        </g>
+      </g>
+      <line x1="968" y1="229" x2="1000" y2="229" stroke="var(--ci)" marker-end="url(#arrow)"/>
+      <g transform="translate(1002,196)">
+        <rect width="178" height="66" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="89" y="22" text-anchor="middle" font-size="10.5" fill="var(--text)">Deployed</text>
+        <text x="89" y="38" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">dev · staging · prod</text>
+        <text x="89" y="52" text-anchor="middle" font-size="8.5" fill="var(--text-faint)">VPCs, GKE, AI apps</text>
+      </g>
+
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ci)"/>
+        </marker>
+        <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--border)"/>
+        </marker>
+      </defs>
+    </svg>
+  </figure>
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--ci)"></i>pipeline step</span>
+    <span><i class="swatch" style="background:var(--net)"></i>WIF / networking</span>
+    <span>⚿ = gated behind a GitHub Environment reviewer</span>
+  </div>
+</section>
+
+<section aria-labelledby="phases-h">
+  <h2 id="phases-h">Build phases</h2>
+  <p class="section-sub">Each phase is applied, and tested, before the next begins.</p>
+  <div class="phases">
+    <div class="phase">
+      <span class="num">PHASE 1</span>
+      <h3>Account factory &amp; networking</h3>
+      <p>Org folders, per-environment projects, hub-and-spoke VPCs over NCC, baseline firewalls. Verified with <code>tests/connectivity</code> before anything else is built on top.</p>
+      <div class="stages"><code>0-bootstrap</code><code>1-organization</code><code>2-networking</code><code>3-projects</code></div>
+    </div>
+    <div class="phase">
+      <span class="num">PHASE 2</span>
+      <h3>Kubernetes</h3>
+      <p>One private, VPC-native GKE cluster per environment — each behind its own spoke VPC, reachable from the others only through the NCC hub.</p>
+      <div class="stages"><code>4-gke</code></div>
+    </div>
+    <div class="phase">
+      <span class="num">PHASE 3</span>
+      <h3>AI apps</h3>
+      <p>A Vertex AI Workbench notebook and an optional Cloud Run service, dropped into an environment's project/VPC to practice serving models alongside your GKE workloads.</p>
+      <div class="stages"><code>5-ai-apps</code></div>
+    </div>
+  </div>
+</section>
+
+<footer class="page">
+  <span>gcp-control-tower · Terraform + GitHub Actions</span>
+  <span class="mono">africa-south1 (Johannesburg)</span>
+</footer>

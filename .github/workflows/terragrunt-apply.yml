@@ -1,0 +1,82 @@
+name: Terragrunt Apply (main)
+
+# Applies every Terragrunt-managed stage on merge to main, in dependency
+# order, via `terragrunt run-all apply` at the repo root — tests/connectivity
+# depends on 1-networking's outputs (see tests/connectivity/terragrunt.hcl),
+# and run-all sequences that automatically, no manual ordering needed.
+#
+# That's the only Terragrunt-managed path wired into the default pipeline
+# right now — see the note in terragrunt-plan.yml about advanced/. Use
+# workflow_dispatch with a `stage` input to apply just one Terragrunt stage
+# instead (1-networking or tests/connectivity). The advanced/ stages are
+# still plain Terraform, not Terragrunt — apply those by hand with
+# `terraform apply` through the same WIF identity.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "1-networking/**"
+      - "tests/connectivity/**"
+      - "modules/**"
+      - "terragrunt.hcl"
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Terragrunt stage to apply on its own (1-networking or tests/connectivity). Leave blank to run-all apply everything."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TERRAFORM_VERSION: "1.9.8"
+  TERRAGRUNT_VERSION: "0.68.4"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: shared-infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: ${{ env.TERRAGRUNT_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write environments/common.hcl (CI-only, from secrets)
+        run: |
+          cat > environments/common.hcl <<EOF
+          locals {
+            billing_account = "${{ secrets.GCP_BILLING_ACCOUNT }}"
+            region          = "${{ vars.GCP_REGION || 'africa-south1' }}"
+            state_bucket    = "${{ secrets.TF_STATE_BUCKET }}"
+            org_id          = null
+          }
+          EOF
+
+      - name: terragrunt run-all apply
+        if: github.event.inputs.stage == ''
+        run: |
+          terragrunt run-all apply --terragrunt-non-interactive -no-color \
+            -input=false -auto-approve
+
+      - name: terragrunt apply (single stage)
+        if: github.event.inputs.stage != ''
+        working-directory: ${{ github.event.inputs.stage }}
+        run: |
+          terragrunt apply --terragrunt-non-interactive -no-color \
+            -input=false -auto-approve

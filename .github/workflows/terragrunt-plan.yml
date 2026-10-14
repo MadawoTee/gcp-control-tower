@@ -1,0 +1,103 @@
+name: Terragrunt Plan (PR)
+
+# Runs hclfmt/validate/plan for each Terragrunt-managed stage in a PR, and
+# posts each plan as a PR comment. Nothing is applied here — see
+# terragrunt-apply.yml.
+#
+# This mirrors `terragrunt plan` run locally. The one CI-only step is
+# writing environments/common.hcl from secrets — that file is gitignored
+# and never committed (see the "Why no Organization" section of the root
+# README), so CI generates its own copy from repo secrets each run and it
+# never touches disk anywhere but the ephemeral runner.
+#
+# Only 1-networking and tests/connectivity are wired up by default right
+# now (Phase 1/2) — they're the only stages converted to Terragrunt so
+# far. The advanced/ stages are real, working Terraform, but stay out of
+# the default CI paths until their tickets (NET-5 onward) come up and
+# they're converted too — see advanced/README.md.
+
+on:
+  pull_request:
+    paths:
+      - "1-networking/**"
+      - "tests/connectivity/**"
+      - "modules/**"
+      - "terragrunt.hcl"
+      - ".github/workflows/terragrunt-plan.yml"
+
+permissions:
+  contents: read
+  id-token: write # required for Workload Identity Federation
+  pull-requests: write # required to comment the plan on the PR
+
+env:
+  TERRAFORM_VERSION: "1.9.8"
+  TERRAGRUNT_VERSION: "0.68.4"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stage: ["1-networking", "tests/connectivity"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false # terragrunt needs terraform's raw stdout
+
+      - uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: ${{ env.TERRAGRUNT_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write environments/common.hcl (CI-only, from secrets)
+        run: |
+          cat > environments/common.hcl <<EOF
+          locals {
+            billing_account = "${{ secrets.GCP_BILLING_ACCOUNT }}"
+            region          = "${{ vars.GCP_REGION || 'africa-south1' }}"
+            state_bucket    = "${{ secrets.TF_STATE_BUCKET }}"
+            org_id          = null
+          }
+          EOF
+
+      - name: terragrunt hclfmt check
+        working-directory: ${{ matrix.stage }}
+        run: terragrunt hclfmt --terragrunt-check
+
+      # No separate "terragrunt init" step — unlike plain terraform,
+      # terragrunt auto-inits (including regenerating the backend/provider
+      # files from terragrunt.hcl) the first time validate/plan need it.
+      - name: terragrunt validate
+        working-directory: ${{ matrix.stage }}
+        run: terragrunt validate --terragrunt-non-interactive
+
+      - name: terragrunt plan
+        working-directory: ${{ matrix.stage }}
+        run: |
+          terragrunt plan --terragrunt-non-interactive -no-color -input=false \
+            -out=tfplan.binary | tee plan_output.txt
+
+      - name: Comment plan on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const stage = '${{ matrix.stage }}';
+            const output = fs.readFileSync(`${stage}/plan_output.txt`, 'utf8').slice(-60000);
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `#### Terragrunt Plan — \`${stage}\`\n<details><summary>Show plan</summary>\n\n\`\`\`\n${output}\n\`\`\`\n</details>`
+            });

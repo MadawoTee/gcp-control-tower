@@ -1,0 +1,351 @@
+<title>Learning Lab Backlog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="board-css">
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eef0f4; --border:#d7dbe3;
+    --text:#171b24; --text-dim:#5c6472; --text-faint:#8991a1;
+
+    --found:#4b5568; --found-soft:#eceef2;
+    --net:#2f5fd6;   --net-soft:#eaf0ff;
+    --gke:#177a4c;   --gke-soft:#e7f6ee;
+    --sec:#b5342a;   --sec-soft:#fbe9e7;
+    --obs:#8548c9;   --obs-soft:#f2ecfb;
+    --ai:#0d7e93;    --ai-soft:#e4f4f7;
+
+    --s-backlog-fg:#5c6472; --s-backlog-bg:#e9ebef;
+    --s-next-fg:#2f5fd6;    --s-next-bg:#e3ebff;
+    --s-progress-fg:#a15b00; --s-progress-bg:#fdedd3;
+    --s-done-fg:#1a8a52;    --s-done-bg:#dff5e8;
+
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12141b; --surface:#1a1d26; --surface-2:#20232e; --border:#323645;
+      --text:#eef0f4; --text-dim:#a7aebb; --text-faint:#6f7788;
+      --found:#9aa3b5; --found-soft:#23262f;
+      --net:#7fa2ff;   --net-soft:#1c2542;
+      --gke:#5fd9a2;   --gke-soft:#173226;
+      --sec:#f28b81;   --sec-soft:#3a1f1c;
+      --obs:#c3a4f2;   --obs-soft:#2b2140;
+      --ai:#6fd6ea;    --ai-soft:#12313a;
+
+      --s-backlog-fg:#a7aebb; --s-backlog-bg:#262a35;
+      --s-next-fg:#8fb0ff;    --s-next-bg:#1e2b52;
+      --s-progress-fg:#f0b258; --s-progress-bg:#3a2c14;
+      --s-done-fg:#5fd9a2;    --s-done-bg:#173226;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12141b; --surface:#1a1d26; --surface-2:#20232e; --border:#323645;
+    --text:#eef0f4; --text-dim:#a7aebb; --text-faint:#6f7788;
+    --found:#9aa3b5; --found-soft:#23262f;
+    --net:#7fa2ff;   --net-soft:#1c2542;
+    --gke:#5fd9a2;   --gke-soft:#173226;
+    --sec:#f28b81;   --sec-soft:#3a1f1c;
+    --obs:#c3a4f2;   --obs-soft:#2b2140;
+    --ai:#6fd6ea;    --ai-soft:#12313a;
+
+    --s-backlog-fg:#a7aebb; --s-backlog-bg:#262a35;
+    --s-next-fg:#8fb0ff;    --s-next-bg:#1e2b52;
+    --s-progress-fg:#f0b258; --s-progress-bg:#3a2c14;
+    --s-done-fg:#5fd9a2;    --s-done-bg:#173226;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    padding-inline:20px; padding-block:32px; max-width:1180px; margin-inline:auto;}
+  h1,h2,h3{font-family:"Manrope",ui-sans-serif,system-ui,sans-serif; text-wrap:balance; margin:0;}
+  h1{font-size:clamp(1.5rem,4vw,2.1rem); font-weight:800; letter-spacing:-0.02em;}
+  p{color:var(--text-dim); line-height:1.55; margin:0;}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;}
+
+  header.page{display:flex; flex-direction:column; gap:12px; padding-block-end:22px; margin-block-end:8px; border-bottom:1px solid var(--border);}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--net); font-weight:500;}
+  header.page p{max-width:66ch; font-size:.94rem;}
+
+  .progress-row{display:flex; align-items:center; gap:12px; margin-block-start:2px;}
+  .progress-track{flex:1; height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden;}
+  .progress-fill{height:100%; background:var(--net); border-radius:99px; transition:width .25s ease;}
+  .progress-label{font-size:.78rem; color:var(--text-faint); white-space:nowrap;}
+
+  main{display:flex; flex-direction:column; gap:34px; margin-block-start:28px;}
+
+  .epic > h2{
+    display:flex; align-items:center; gap:9px;
+    font-size:1.02rem; font-weight:700; margin-block-end:14px;
+  }
+  .epic-dot{width:10px; height:10px; border-radius:3px; flex:none; background:var(--_accent);}
+  .epic-count{font-weight:500; color:var(--text-faint); font-size:.78rem;}
+  .epic-found{--_accent:var(--found);} .epic-net{--_accent:var(--net);} .epic-gke{--_accent:var(--gke);}
+  .epic-sec{--_accent:var(--sec);} .epic-obs{--_accent:var(--obs);} .epic-ai{--_accent:var(--ai);}
+  .epic > h2{color:var(--_accent);}
+
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr)); gap:12px;}
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--_accent);
+    border-radius:10px; padding:13px 14px; display:flex; flex-direction:column; gap:8px;
+  }
+  .card-top{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .ticket-id{font-size:.74rem; color:var(--text-faint); font-weight:500;}
+  .card h3{font-size:.92rem; font-weight:600; line-height:1.3;}
+  .card .ac{font-size:.8rem;}
+  .ac-label{font-family:"IBM Plex Mono",monospace; font-size:.66rem; color:var(--text-faint); border:1px solid var(--border); border-radius:4px; padding:1px 5px; margin-inline-end:5px;}
+  .card-foot{display:flex; gap:6px; margin-block-start:2px;}
+  .tag{font-size:.68rem; padding:2px 7px; border-radius:5px; background:var(--surface-2); color:var(--text-dim); border:1px solid var(--border);}
+
+  .status-pill{
+    font-family:"IBM Plex Mono",monospace; font-size:.68rem; font-weight:500;
+    border:none; border-radius:99px; padding:4px 10px; cursor:pointer;
+    background:var(--s-backlog-bg); color:var(--s-backlog-fg);
+    transition:transform .1s ease;
+  }
+  .status-pill:hover{transform:translateY(-1px);}
+  .status-pill:focus-visible{outline:2px solid var(--net); outline-offset:2px;}
+  .status-pill:disabled{cursor:default;}
+  .status-pill.s-backlog{background:var(--s-backlog-bg); color:var(--s-backlog-fg);}
+  .status-pill.s-next{background:var(--s-next-bg); color:var(--s-next-fg);}
+  .status-pill.s-progress{background:var(--s-progress-bg); color:var(--s-progress-fg);}
+  .status-pill.s-done{background:var(--s-done-bg); color:var(--s-done-fg);}
+
+  .legend{display:flex; flex-wrap:wrap; gap:10px 20px; margin-block-start:6px; font-size:.8rem; color:var(--text-dim);}
+  .legend span{display:inline-flex; align-items:center; gap:7px;}
+  .swatch{width:11px; height:11px; border-radius:99px; flex:none;}
+  .swatch.s-backlog{background:var(--s-backlog-fg);} .swatch.s-next{background:var(--s-next-fg);}
+  .swatch.s-progress{background:var(--s-progress-fg);} .swatch.s-done{background:var(--s-done-fg);}
+
+  footer.page{border-top:1px solid var(--border); padding-block-start:18px; margin-block-start:30px; font-size:.8rem; color:var(--text-faint);
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;}
+
+  @media (max-width:480px){
+    .card-grid{grid-template-columns:1fr;}
+  }
+</style>
+
+<div id="app"></div>
+
+<script type="application/json" id="board-data">
+{
+  "tickets": [
+    {"id":"FOUND-1","epic":"FOUND","title":"Bootstrap Terraform: standalone seed project, state bucket, WIF","ac":"terraform apply succeeds in 0-bootstrap with org_id unset; state migrated to GCS.","cost":"$0","size":"M","status":"next"},
+    {"id":"FOUND-2","epic":"FOUND","title":"Link billing account + set budget alert","ac":"Test budget alert email received at the chosen threshold.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"FOUND-3","epic":"FOUND","title":"Naming & labeling convention (env/app/owner) — a folder substitute","ac":"Convention documented; applied via project-factory's labels on every resource.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"FOUND-4","epic":"FOUND","title":"Clean terraform plan for 1-networking before NET epic starts","ac":"Plan shows only the expected project + VPC + NAT + firewall resources, no errors.","cost":"$0","size":"S","status":"backlog"},
+
+    {"id":"NET-1","epic":"NET","title":"Single custom VPC in dev (2 subnets)","ac":"Both subnets listed; Private Google Access enabled.","cost":"$0","size":"M","status":"backlog"},
+    {"id":"NET-2","epic":"NET","title":"Cloud Router + Cloud NAT for the dev VPC","ac":"Private VM reaches the internet with no external IP.","cost":"~$1–3/mo","size":"S","status":"backlog"},
+    {"id":"NET-3","epic":"NET","title":"Firewall baseline (IAP-only SSH, internal, health checks)","ac":"IAP SSH works; direct internet SSH is blocked.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"NET-4","epic":"NET","title":"Run connectivity tests + review VPC Flow Logs","ac":"All checks pass; a flow log entry found for test traffic.","cost":"~$0.50/mo","size":"S","status":"backlog"},
+    {"id":"NET-5","epic":"NET","title":"Level up: hub-and-spoke via NCC (+ staging spoke)","ac":"dev and staging VPCs reach each other with no direct peering.","cost":"~$2–4/mo","size":"L","status":"backlog"},
+
+    {"id":"GKE-1","epic":"GKE","title":"Private, VPC-native GKE Autopilot cluster","ac":"kubectl get nodes works; nodes have no external IP.","cost":"~$5–10/mo","size":"L","status":"backlog"},
+    {"id":"GKE-2","epic":"GKE","title":"Namespaces + resource quotas","ac":"platform / observability / applications exist; quota enforced.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"GKE-3","epic":"GKE","title":"Sample app via Workload Identity","ac":"Pod calls a GCP API with zero key files anywhere.","cost":"$0","size":"M","status":"backlog"},
+    {"id":"GKE-4","epic":"GKE","title":"Default-deny NetworkPolicy + explicit allows","ac":"Cross-namespace call blocked by default, works after allow policy.","cost":"$0","size":"M","status":"backlog"},
+    {"id":"GKE-5","epic":"GKE","title":"Second cluster in staging spoke (after NET-5)","ac":"Pod in gke-dev reaches a Service in gke-staging over NCC.","cost":"~$5–10/mo","size":"L","status":"backlog"},
+
+    {"id":"SEC-1","epic":"SEC","title":"IAM least-privilege pass (you + CI service account)","ac":"CI SA holds only roles each stage needs — no project Editor/Owner.","cost":"$0","size":"M","status":"backlog"},
+    {"id":"SEC-2","epic":"SEC","title":"Enable Security Command Center, document free vs paid","ac":"Written note on SCC Standard vs Premium findings for this project.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"SEC-3","epic":"SEC","title":"Audit logging review (enable Data Access logs)","ac":"A Data Access log entry appears for a read on a Secret.","cost":"~$0–1/mo","size":"S","status":"backlog"},
+    {"id":"SEC-4","epic":"SEC","title":"KMS key ring + CMEK on one real resource","ac":"A bucket or GKE Secret is encrypted with your own key.","cost":"~$0.06/key/mo","size":"M","status":"backlog"},
+    {"id":"SEC-5","epic":"SEC","title":"Stretch: VPC Service Controls perimeter","ac":"A call from outside the perimeter to a protected API is denied.","cost":"$0","size":"L","status":"backlog"},
+
+    {"id":"OBS-1","epic":"OBS","title":"Cloud Monitoring workspace + uptime check","ac":"Uptime dashboard green; manual outage trips an alert.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"OBS-2","epic":"OBS","title":"Managed Prometheus scraping GKE + one PromQL alert","ac":"Custom metric in Metrics Explorer; alert fires on load test.","cost":"~$0–3/mo","size":"M","status":"backlog"},
+    {"id":"OBS-3","epic":"OBS","title":"Log-based metric + alert (firewall denies)","ac":"Blocked connection increments metric and fires alert.","cost":"$0","size":"S","status":"backlog"},
+    {"id":"OBS-4","epic":"OBS","title":"Optional: Grafana reading Managed Prometheus","ac":"Grafana dashboard renders the same metrics as OBS-2.","cost":"$0–~$5/mo","size":"M","status":"backlog"},
+    {"id":"OBS-5","epic":"OBS","title":"One dashboard: infra / k8s / app / network / security","ac":"Single dashboard shows a chart from each of the five areas.","cost":"$0","size":"M","status":"backlog"},
+
+    {"id":"AI-1","epic":"AI","title":"Cloud Storage bucket for model artifacts","ac":"Bucket created with a 30-day lifecycle rule.","cost":"~$0","size":"S","status":"backlog"},
+    {"id":"AI-2","epic":"AI","title":"Deploy a lightweight inference container to GKE","ac":"Small model behind FastAPI responds to a test request.","cost":"within GKE-1","size":"M","status":"backlog"},
+    {"id":"AI-3","epic":"AI","title":"Register the same model on Vertex AI, deploy an endpoint","ac":"Vertex AI endpoint returns the same prediction as GKE.","cost":"~$0.05–0.20/hr","size":"M","status":"backlog"},
+    {"id":"AI-4","epic":"AI","title":"Call the Vertex AI endpoint from the GKE app","ac":"GKE app response includes a Vertex AI prediction, no key file.","cost":"pay-per-call","size":"M","status":"backlog"},
+    {"id":"AI-5","epic":"AI","title":"Teardown checklist: stop all AI/GPU billing each session","ac":"Endpoint undeployed, no GPU pool left running, checklist ticked.","cost":"$0 (saves money)","size":"S","status":"backlog"}
+  ]
+}
+</script>
+
+<script>
+var SELF_SRC = document.currentScript ? document.currentScript.textContent : '';
+
+var EPICS = [
+  {key:'FOUND', name:'Foundation', accent:'found'},
+  {key:'NET', name:'Networking', accent:'net'},
+  {key:'GKE', name:'Kubernetes', accent:'gke'},
+  {key:'SEC', name:'Security', accent:'sec'},
+  {key:'OBS', name:'Observability', accent:'obs'},
+  {key:'AI', name:'AI / ML', accent:'ai'}
+];
+
+var STATUS_ORDER = ['backlog','next','progress','done'];
+var STATUS_META = {
+  backlog:{label:'Backlog', cls:'s-backlog'},
+  next:{label:'Next', cls:'s-next'},
+  progress:{label:'In Progress', cls:'s-progress'},
+  done:{label:'Done', cls:'s-done'}
+};
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+var dataEl = document.getElementById('board-data');
+var state;
+try{
+  state = JSON.parse(dataEl.textContent);
+}catch(e){
+  state = {tickets: []};
+}
+
+window.__canEdit = true;
+
+function renderCard(t){
+  var st = STATUS_META[t.status] || STATUS_META.backlog;
+  var disabledAttr = window.__canEdit === false ? ' disabled' : '';
+  return '' +
+    '<article class="card">' +
+      '<div class="card-top">' +
+        '<span class="ticket-id mono">' + esc(t.id) + '</span>' +
+        '<button type="button" class="status-pill ' + st.cls + '" data-status-pill data-id="' + esc(t.id) + '"' + disabledAttr + '>' + esc(st.label) + '</button>' +
+      '</div>' +
+      '<h3>' + esc(t.title) + '</h3>' +
+      '<p class="ac"><span class="ac-label">AC</span>' + esc(t.ac) + '</p>' +
+      '<div class="card-foot">' +
+        '<span class="tag mono">' + esc(t.size) + '</span>' +
+        '<span class="tag mono">' + esc(t.cost) + '</span>' +
+      '</div>' +
+    '</article>';
+}
+
+function renderApp(state){
+  var total = state.tickets.length;
+  var done = 0;
+  for (var i = 0; i < state.tickets.length; i++) { if (state.tickets[i].status === 'done') done++; }
+  var pct = total ? Math.round((done / total) * 100) : 0;
+
+  var header = '' +
+    '<header class="page">' +
+      '<span class="eyebrow">GCP learning lab · backlog</span>' +
+      '<h1>Learning Lab Backlog</h1>' +
+      '<p>' + EPICS.length + ' epics, ' + total + ' tickets, one phase at a time. Click a status pill to move a ticket through Backlog → Next → In Progress → Done — it saves for everyone with this page open.</p>' +
+      '<div class="progress-row">' +
+        '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<span class="progress-label mono">' + done + '/' + total + ' done · ' + pct + '%</span>' +
+      '</div>' +
+    '</header>';
+
+  var epicsHtml = '';
+  for (var e = 0; e < EPICS.length; e++) {
+    var ep = EPICS[e];
+    var items = state.tickets.filter(function(t){ return t.epic === ep.key; });
+    var cards = items.map(renderCard).join('');
+    epicsHtml += '' +
+      '<section class="epic epic-' + ep.accent + '" aria-labelledby="epic-' + ep.key + '">' +
+        '<h2 id="epic-' + ep.key + '"><span class="epic-dot"></span>' + esc(ep.name) + ' <span class="epic-count mono">' + items.length + '</span></h2>' +
+        '<div class="card-grid">' + cards + '</div>' +
+      '</section>';
+  }
+
+  var legend = '<div class="legend">';
+  for (var k = 0; k < STATUS_ORDER.length; k++) {
+    var key = STATUS_ORDER[k];
+    var meta = STATUS_META[key];
+    legend += '<span><i class="swatch ' + meta.cls + '"></i>' + meta.label + '</span>';
+  }
+  legend += '</div>';
+
+  var footer = '' +
+    '<footer class="page">' +
+      '<span>gcp-control-tower · backlog board</span>' +
+      '<span class="mono">' + (window.__canEdit === false ? 'read-only view' : 'click a status pill to update') + '</span>' +
+    '</footer>';
+
+  return header + '<main>' + epicsHtml + '</main>' + legend + footer;
+}
+
+var appEl = document.getElementById('app');
+
+function paint(){
+  appEl.innerHTML = renderApp(state);
+}
+
+paint();
+
+async function useCap(name){
+  try{
+    if (!window.claude || typeof window.claude.use !== 'function') return null;
+    return await window.claude.use(name);
+  }catch(e){
+    return null;
+  }
+}
+
+function buildDocument(state){
+  var css = document.getElementById('board-css').textContent;
+  var dataJson = JSON.stringify(state).replace(/</g, '\\u003c');
+  var appHtml = renderApp(state);
+  var closeScript = '<' + '/script>';
+  return '' +
+    '<!doctype html><html><head>' +
+    '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' +
+    '<title>Learning Lab Backlog</title>' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">' +
+    '<style id="board-css">' + css + '</style>' +
+    '</head><body>' +
+    '<div id="app">' + appHtml + '</div>' +
+    '<script type="application/json" id="board-data">' + dataJson + closeScript +
+    '<script>' + SELF_SRC + closeScript +
+    '</body></html>';
+}
+
+var persistTimer = null;
+function schedulePersist(){
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(persist, 150);
+}
+
+async function persist(){
+  var artifact = await useCap('artifact');
+  if (!artifact) return;
+  try{
+    await artifact.publish(buildDocument(state));
+  }catch(err){
+    console.warn('board: publish failed', err);
+  }
+}
+
+appEl.addEventListener('click', function(e){
+  var btn = e.target.closest && e.target.closest('[data-status-pill]');
+  if (!btn || btn.disabled) return;
+  if (window.__canEdit === false) return;
+  var id = btn.getAttribute('data-id');
+  var t = null;
+  for (var i = 0; i < state.tickets.length; i++) { if (state.tickets[i].id === id) { t = state.tickets[i]; break; } }
+  if (!t) return;
+  var idx = STATUS_ORDER.indexOf(t.status);
+  t.status = STATUS_ORDER[(idx + 1) % STATUS_ORDER.length];
+  paint();
+  schedulePersist();
+});
+
+(async function initEditability(){
+  var user = await useCap('user');
+  if (user && typeof user.canEdit === 'function') {
+    try{
+      var can = await user.canEdit();
+      if (can !== window.__canEdit) {
+        window.__canEdit = can;
+        paint();
+      }
+    }catch(e){}
+  }
+})();
+</script>

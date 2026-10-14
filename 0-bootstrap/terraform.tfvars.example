@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and fill in your real values.
+# terraform.tfvars is gitignored on purpose — never commit real IDs/secrets.
+
+# No Organization yet (the default for a personal GCP account) -> leave
+# org_id unset entirely, or explicitly null. If you later set up Cloud
+# Identity Free on a domain, uncomment and fill this in, then re-apply.
+# org_id                = "123456789012"
+
+billing_account        = "012345-6789AB-CDEF01"
+seed_project_id_prefix = "ct-seed"
+region                 = "africa-south1"
+github_repository      = "your-github-username/your-repo-name"

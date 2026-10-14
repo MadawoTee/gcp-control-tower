@@ -1,0 +1,16 @@
+# Shared across stages via -var-file. Copy to common.tfvars and fill in
+# real values (common.tfvars is gitignored). Not every stage declares every
+# variable here — Terraform just warns and ignores the ones a given stage
+# doesn't use (e.g. 1-networking ignores org_id and state_bucket).
+#
+# state_bucket comes from: terraform output -raw terraform_state_bucket
+# (run inside 0-bootstrap after its first apply)
+
+billing_account = "012345-6789AB-CDEF01"
+region          = "africa-south1"
+
+# Only needed once you're running stages under advanced/ (state_bucket is
+# also used there via terraform_remote_state; org_id only by
+# advanced/1-organization, once you have a real Organization).
+state_bucket = "taona-ct-seed-xxxx-tfstate"
+# org_id     = "123456789012"

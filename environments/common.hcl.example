@@ -1,0 +1,18 @@
+# Copy to common.hcl (gitignored) and fill in real values. Read by the root
+# terragrunt.hcl and by every stage's terragrunt.hcl — this is the
+# Terragrunt equivalent of environments/common.tfvars.example, and both can
+# coexist: common.tfvars is for plain `terraform apply -var-file=...`,
+# common.hcl is for `terragrunt apply`. Keep them in sync by hand for now.
+
+locals {
+  billing_account = "012345-6789AB-CDEF01"
+  region          = "africa-south1"
+
+  # From: terraform output -raw terraform_state_bucket (run inside
+  # 0-bootstrap after its first apply)
+  state_bucket = "taona-ct-seed-xxxx-tfstate"
+
+  # Leave null unless you've set up Cloud Identity Free on a domain — only
+  # advanced/1-organization reads this.
+  org_id = null
+}
