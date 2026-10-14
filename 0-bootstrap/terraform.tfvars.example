@@ -6,7 +6,16 @@
 # Identity Free on a domain, uncomment and fill this in, then re-apply.
 # org_id                = "123456789012"
 
+# Were you handed a project directly instead of rights to create new ones
+# (resourcemanager.projects.create often restricted on a shared/company
+# account)? Uncomment this and leave billing_account/seed_project_id_prefix
+# alone (they're ignored in this mode) — the state bucket and WIF pool are
+# then built inside this project instead of a new one. Use the SAME value
+# here and in environments/common.hcl's existing_project_id, since on a
+# single-project sandbox both stages share the one project.
+# existing_project_id   = "synthesis-sbx-general"
+
 billing_account        = "012345-6789AB-CDEF01"
-seed_project_id_prefix = "ct-seed"
+seed_project_id_prefix = "taona-ct-seed"
 region                 = "africa-south1"
 github_repository      = "your-github-username/your-repo-name"

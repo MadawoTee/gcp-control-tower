@@ -16,16 +16,25 @@
  * org governance; see advanced/1-organization for the folder hierarchy that
  * unlocks.
  *
+ * If you were handed a project directly instead of rights to create one
+ * (common on a shared/company account — see existing_project_id below),
+ * this stage skips creating a seed project and builds the state bucket +
+ * WIF pool inside that project instead. Nothing else changes: later stages
+ * still just read terraform_state_bucket from this stage's outputs.
+ *
  * Run this once, then never touch it again except to rotate/extend WIF.
  */
 
 resource "random_id" "seed_suffix" {
+  count       = var.existing_project_id == null ? 1 : 0
   byte_length = 2
 }
 
 resource "google_project" "seed" {
+  count = var.existing_project_id == null ? 1 : 0
+
   name                = "Control Tower Seed"
-  project_id          = "${var.seed_project_id_prefix}-${random_id.seed_suffix.hex}"
+  project_id          = "${var.seed_project_id_prefix}-${random_id.seed_suffix[0].hex}"
   org_id              = var.org_id
   billing_account     = var.billing_account
   auto_create_network = false
@@ -37,8 +46,16 @@ resource "google_project" "seed" {
   }
 }
 
+# Only used in existing_project_id mode, to read the project back without
+# Terraform trying to manage (or recreate) it.
+data "google_project" "existing_seed" {
+  count = var.existing_project_id != null ? 1 : 0
+
+  project_id = var.existing_project_id
+}
+
 locals {
-  seed_project_id = google_project.seed.project_id
+  seed_project_id = var.existing_project_id != null ? data.google_project.existing_seed[0].project_id : google_project.seed[0].project_id
 }
 
 resource "google_project_service" "seed_apis" {

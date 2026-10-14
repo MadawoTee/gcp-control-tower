@@ -9,7 +9,7 @@
 module "org_folders" {
   source = "../../modules/org-folders"
 
-  org_id                       = var.org_id
-  top_level_folder_name        = var.top_level_folder_name
-  apply_baseline_org_policies  = var.apply_baseline_org_policies
+  org_id                      = var.org_id
+  top_level_folder_name       = var.top_level_folder_name
+  apply_baseline_org_policies = var.apply_baseline_org_policies
 }

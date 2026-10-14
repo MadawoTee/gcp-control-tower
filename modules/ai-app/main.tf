@@ -22,9 +22,9 @@ resource "google_workbench_instance" "notebook" {
     machine_type = var.notebook_machine_type
 
     network_interfaces {
-      network    = var.network_self_link
-      subnet     = var.subnetwork_self_link
-      nic_type   = "GVNIC"
+      network  = var.network_self_link
+      subnet   = var.subnetwork_self_link
+      nic_type = "GVNIC"
     }
 
     disable_public_ip = true

@@ -26,9 +26,9 @@ module "hub_project" {
   source = "../../modules/project-factory"
 
   project_id_prefix = "networking-hub"
-  folder_id          = data.terraform_remote_state.organization.outputs.networking_folder_id
-  billing_account    = var.billing_account
-  environment        = "networking"
+  folder_id         = data.terraform_remote_state.organization.outputs.networking_folder_id
+  billing_account   = var.billing_account
+  environment       = "networking"
   enabled_apis = [
     "compute.googleapis.com",
     "dns.googleapis.com",
@@ -61,9 +61,9 @@ module "env_net_host_project" {
   source   = "../../modules/project-factory"
 
   project_id_prefix = "${each.key}-net-host"
-  folder_id          = data.terraform_remote_state.organization.outputs.env_folder_ids[each.key]
-  billing_account    = var.billing_account
-  environment        = each.key
+  folder_id         = data.terraform_remote_state.organization.outputs.env_folder_ids[each.key]
+  billing_account   = var.billing_account
+  environment       = each.key
   enabled_apis = [
     "compute.googleapis.com",
     "container.googleapis.com",

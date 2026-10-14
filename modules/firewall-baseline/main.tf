@@ -45,9 +45,9 @@ resource "google_compute_firewall" "allow_internal" {
 }
 
 resource "google_compute_firewall" "allow_health_checks" {
-  project = var.project_id
-  name    = "${var.network_name}-allow-health-checks"
-  network = var.network_name
+  project   = var.project_id
+  name      = "${var.network_name}-allow-health-checks"
+  network   = var.network_name
   direction = "INGRESS"
   priority  = 1000
 
@@ -67,10 +67,10 @@ resource "google_compute_firewall" "allow_health_checks" {
 }
 
 resource "google_compute_firewall" "allow_connectivity_test" {
-  count   = var.enable_connectivity_test_tag ? 1 : 0
-  project = var.project_id
-  name    = "${var.network_name}-allow-connectivity-test"
-  network = var.network_name
+  count     = var.enable_connectivity_test_tag ? 1 : 0
+  project   = var.project_id
+  name      = "${var.network_name}-allow-connectivity-test"
+  network   = var.network_name
   direction = "INGRESS"
   priority  = 1000
 

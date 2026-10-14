@@ -13,9 +13,9 @@ module "app_project" {
   source   = "../../modules/project-factory"
 
   project_id_prefix = "${each.value}-apps"
-  folder_id          = data.terraform_remote_state.organization.outputs.env_folder_ids[each.value]
-  billing_account    = var.billing_account
-  environment        = each.value
+  folder_id         = data.terraform_remote_state.organization.outputs.env_folder_ids[each.value]
+  billing_account   = var.billing_account
+  environment       = each.value
   enabled_apis = [
     "compute.googleapis.com",
     "container.googleapis.com",

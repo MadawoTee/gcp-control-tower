@@ -1,7 +1,7 @@
-# Shared across stages via -var-file. Copy to common.tfvars and fill in
-# real values (common.tfvars is gitignored). Not every stage declares every
-# variable here — Terraform just warns and ignores the ones a given stage
-# doesn't use (e.g. 1-networking ignores org_id and state_bucket).
+# Used by the advanced/ stages via -var-file (still plain Terraform, not
+# Terragrunt). 1-networking and tests/connectivity read environments/
+# common.hcl instead — see common.hcl.example. Copy this file to
+# common.tfvars and fill in real values (common.tfvars is gitignored).
 #
 # state_bucket comes from: terraform output -raw terraform_state_bucket
 # (run inside 0-bootstrap after its first apply)

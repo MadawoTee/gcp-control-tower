@@ -15,4 +15,14 @@ locals {
   # Leave null unless you've set up Cloud Identity Free on a domain — only
   # advanced/1-organization reads this.
   org_id = null
+
+  # Set this (e.g. "synthesis-sbx-general") if you were handed a project
+  # directly instead of rights to create new ones — common on a shared
+  # account where resourcemanager.projects.create is restricted. 1-networking
+  # then builds its VPC inside this project instead of creating a new one.
+  # Use the SAME value in 0-bootstrap/terraform.tfvars's existing_project_id
+  # — on a single-project sandbox, bootstrap's state bucket/WIF pool and
+  # 1-networking's VPC all end up living in this one project. Leave null to
+  # let Terraform create its own project per stage (the default).
+  existing_project_id = null
 }

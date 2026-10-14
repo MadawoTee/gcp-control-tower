@@ -1,5 +1,5 @@
 output "seed_project_id" {
-  value = google_project.seed.project_id
+  value = local.seed_project_id
 }
 
 output "terraform_state_bucket" {

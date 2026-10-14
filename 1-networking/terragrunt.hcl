@@ -7,6 +7,7 @@ locals {
 }
 
 inputs = {
-  billing_account = local.common.locals.billing_account
-  region          = local.common.locals.region
+  billing_account     = local.common.locals.billing_account
+  region              = local.common.locals.region
+  existing_project_id = local.common.locals.existing_project_id
 }

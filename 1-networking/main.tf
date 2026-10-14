@@ -15,9 +15,10 @@
 module "dev_project" {
   source = "../modules/project-factory"
 
-  project_id_prefix = var.project_id_prefix
-  billing_account    = var.billing_account
-  environment        = "dev"
+  project_id_prefix   = var.project_id_prefix
+  existing_project_id = var.existing_project_id
+  billing_account     = var.billing_account
+  environment         = "dev"
   enabled_apis = [
     "compute.googleapis.com",
     "iam.googleapis.com",

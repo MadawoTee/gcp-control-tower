@@ -23,6 +23,27 @@ Identity Free ($0, just the domain costs money), `0-bootstrap` and the
 `advanced/1-organization` stage are ready to bring things under real org
 governance — see `advanced/README.md`.
 
+## Using a project you were already given
+
+On a shared/company GCP account (no Organization visible to you, but other
+projects already in it — e.g. you were handed `synthesis-sbx-general`
+instead of rights to create new projects), `resourcemanager.projects.create`
+is often restricted even though the account itself has no org node. Both
+`0-bootstrap` and `1-networking` support this directly via an
+`existing_project_id` variable: set it and the stage builds its resources
+(state bucket + WIF pool, or the VPC) inside that project instead of trying
+to create a new one. `billing_account`/`seed_project_id_prefix`/
+`project_id_prefix` are all ignored in this mode — the project's identity
+and billing stay whatever they already were.
+
+Use the *same* project ID in both places — see the `existing_project_id`
+comments in `0-bootstrap/terraform.tfvars.example` and
+`environments/common.hcl.example`. On a single-project sandbox everything
+(Terraform state bucket, the GitHub WIF pool, the dev VPC, and later GKE/AI
+workloads) ends up living in that one project, which is the normal shape
+for this setup — nothing here assumes you have more than one project to
+work with.
+
 ## Layout
 
 ```
@@ -95,6 +116,9 @@ session — see `tests/connectivity/README.md`).
 # 1. Bootstrap (run once, by hand, with your own gcloud credentials)
 cd 0-bootstrap
 cp terraform.tfvars.example terraform.tfvars   # fill in billing_account, github_repository (leave org_id unset)
+# Handed a project instead of rights to create one? Set existing_project_id
+# in terraform.tfvars instead (see "Using a project you were already given"
+# above) and skip billing_account/seed_project_id_prefix.
 terraform init
 terraform apply
 
@@ -113,7 +137,8 @@ Then:
 2. Copy `environments/common.hcl.example` to `environments/common.hcl` and
    fill in `billing_account`, `state_bucket`, `region` (this is what
    Terragrunt reads; `environments/common.tfvars.example` still exists too,
-   for the plain-Terraform stages — keep both in sync by hand).
+   for the plain-Terraform stages — keep both in sync by hand). If you set
+   `existing_project_id` in step 1, set the same value here too.
 3. Push this repo to GitHub. In the repo's Settings → Secrets and
    variables → Actions **Secrets** tab, add: `GCP_BILLING_ACCOUNT`,
    `TF_STATE_BUCKET`, `WIF_PROVIDER` (the `workload_identity_provider`
